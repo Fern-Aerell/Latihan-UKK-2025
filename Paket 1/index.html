@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rellkulator</title>
+    <style>
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="sub_output"></div>
+        <div id="output">0</div>
+        <div>
+            <div>
+                <button id="button_percen">%</button>
+                <button id="button_clear">C</button>
+                <button id="button_delete">D</button>
+                <button id="button_div">/</button>
+            </div>
+            <div>
+                <button id="button_7">7</button>
+                <button id="button_8">8</button>
+                <button id="button_9">9</button>
+                <button id="button_mul">*</button>
+            </div>
+            <div>
+                <button id="button_4">4</button>
+                <button id="button_5">5</button>
+                <button id="button_6">6</button>
+                <button id="button_sub">-</button>
+            </div>
+            <div>
+                <button id="button_1">1</button>
+                <button id="button_2">2</button>
+                <button id="button_3">3</button>
+                <button id="button_add">+</button>
+            </div>
+            <div>
+                <button id="button_positive_negative">+/-</button>
+                <button id="button_0">0</button>
+                <button id="button_coma">,</button>
+                <button id="button_equal">=</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const sub_output = document.getElementById("sub_output");
+        const output = document.getElementById("output");
+        const button_percen = document.getElementById("button_percen");
+        const button_clear = document.getElementById("button_clear");
+        const button_delete = document.getElementById("button_delete");
+        const button_div = document.getElementById("button_div");
+        const button_7 = document.getElementById("button_7");
+        const button_8 = document.getElementById("button_8");
+        const button_9 = document.getElementById("button_9");
+        const button_mul = document.getElementById("button_mul");
+        const button_4 = document.getElementById("button_4");
+        const button_5 = document.getElementById("button_5");
+        const button_6 = document.getElementById("button_6");
+        const button_sub = document.getElementById("button_sub");
+        const button_1 = document.getElementById("button_1");
+        const button_2 = document.getElementById("button_2");
+        const button_3 = document.getElementById("button_3");
+        const button_add = document.getElementById("button_add");
+        const button_positive_negative = document.getElementById("button_positive_negative");
+        const button_0 = document.getElementById("button_0");
+        const button_comma = document.getElementById("button_coma");
+        const button_equal = document.getElementById("button_equal");
+
+        const opSign = [
+            '/',
+            '*',
+            '-',
+            '+',
+        ];
+
+        function clear() {
+            sub_output.innerText = "";
+            output.innerText = 0;
+        }
+
+        function del() {
+            output.innerText = output.innerText.substring(0, output.innerText.length - 1);
+            if (output.innerText.length == 0) output.innerText = 0;
+        }
+
+        function infinityAndNaNHandle() {
+            if (
+                output.innerText.toLowerCase().includes("infinity") ||
+                output.innerText.toLowerCase().includes("nan") ||
+                sub_output.innerText.toLowerCase().includes("infinity") ||
+                sub_output.innerText.toLowerCase().includes("nan")
+            ) {
+                Swal.fire({
+                    title: "Kesalahan",
+                    text: "Tidak dapat melakukan operasi matematika dengan Infinity dan NaN.",
+                    icon: "error",
+
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        clear();
+                    }
+                });
+                clear();
+            }
+        }
+
+        function insertNumber(number) {
+            infinityAndNaNHandle();
+
+            if (output.innerText.startsWith('0') && !output.innerText.includes('.')) {
+                output.innerText = number;
+                return;
+            }
+
+            output.innerText += number;
+        }
+
+        function insertComma() {
+            infinityAndNaNHandle();
+
+            if (!output.innerText.includes('.')) {
+                output.innerText += '.';
+            }
+        }
+
+        function insertOp(op) {
+            infinityAndNaNHandle();
+
+            if (opSign.includes(output.innerText[output.innerText.length - 1])) {
+                del();
+            }
+
+            if (sub_output.innerText.length > 0) {
+                sub_output.innerText = eval(`${sub_output.innerText}(${output.innerText})`);
+                sub_output.innerText += ` ${op} `;
+                output.innerText = 0;
+                return;
+            }
+
+            sub_output.innerText += output.innerText;
+            sub_output.innerText += ` ${op} `;
+            output.innerText = 0;
+        }
+
+        function equal() {
+            infinityAndNaNHandle();
+
+            if (sub_output.innerText.length > 0) {
+                output.innerText = eval(`${sub_output.innerText}(${output.innerText})`);
+                sub_output.innerText = "";
+            }
+        }
+
+        function percen() {
+            infinityAndNaNHandle();
+
+            if (output.innerText.length > 0) {
+                output.innerText = eval(`${output.innerText}/100`);
+            }
+        }
+
+        function positive_negative() {
+            infinityAndNaNHandle();
+
+            if (output.innerText.length > 0 && output.innerText != '0') {
+                if (output.innerText.startsWith("-")) {
+                    output.innerText = output.innerText.substring(1, output.innerText.length);
+                } else {
+                    output.innerText = `-${output.innerText}`;
+                }
+            }
+        }
+
+        button_clear.addEventListener("click", clear);
+        button_delete.addEventListener("click", del);
+        button_1.addEventListener("click", () => insertNumber(1));
+        button_2.addEventListener("click", () => insertNumber(2));
+        button_3.addEventListener("click", () => insertNumber(3));
+        button_4.addEventListener("click", () => insertNumber(4));
+        button_5.addEventListener("click", () => insertNumber(5));
+        button_6.addEventListener("click", () => insertNumber(6));
+        button_7.addEventListener("click", () => insertNumber(7));
+        button_8.addEventListener("click", () => insertNumber(8));
+        button_9.addEventListener("click", () => insertNumber(9));
+        button_0.addEventListener("click", () => insertNumber(0));
+        button_div.addEventListener("click", () => insertOp(opSign[0]));
+        button_mul.addEventListener("click", () => insertOp(opSign[1]));
+        button_sub.addEventListener("click", () => insertOp(opSign[2]));
+        button_add.addEventListener("click", () => insertOp(opSign[3]));
+        button_equal.addEventListener("click", equal);
+        button_comma.addEventListener("click", insertComma);
+        button_percen.addEventListener("click", percen);
+        button_positive_negative.addEventListener("click", positive_negative);
+    </script>
+</body>
+
+</html>
